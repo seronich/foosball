@@ -1,0 +1,2 @@
+# foosball
+Foosball table automation
