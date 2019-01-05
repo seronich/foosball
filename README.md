@@ -10,6 +10,7 @@ uses:
 - prototype shield for Arduino Uno
 - Misc wire and connector
 
+features:
 - interrupts to read beam break sensor
 - goal horn and goal LEDs (one per goal)
 - scoreboard 
