@@ -8,8 +8,8 @@ int irL=2;
 int irR=3;
 
 // pins for goal indicator LEDs digital output D4 and D5
-int goalL=4;
-int goalR=5;
+int goalL=6;
+int goalR=7;
 
 
 // pins for the TM1638 display module from DX
@@ -36,7 +36,7 @@ int previousgoalR=0;
 byte displayDigits[] = {63,6,91,79,102,109,124,7,127,103 };
 
 // set up placeholders for display with "-" in the middle
-byte values[] = { 0,0,0,0,64,0,0,0 };
+byte values[] = { 0,0,0,64,64,0,0,0 };
 
 // location to display goal scores
 int dispL=1;
@@ -46,13 +46,15 @@ int dispR=7;
 byte buttons=0;
 byte prevbuttons=0;
 
-// initialize module
-TM1638 module(dio,clk,stb0);
+
 
 // some debouncing for interrupts 
-long debouncing_time = 1500; //Debouncing Time in Milliseconds
+long debouncing_time = 10000; //Debouncing Time in Milliseconds - give time to remove ball without tripping beam break
 volatile unsigned long last_microsL;
 volatile unsigned long last_microsR;
+
+// initialize module
+TM1638 module(dio,clk,stb0);
 
 void goalhorn(int,int);
 
@@ -61,8 +63,8 @@ void setup() {
 pinMode(irL,INPUT_PULLUP);  
 pinMode(irR,INPUT_PULLUP);  
 
-//inMode(goalL,OUTPUT);
-//pinMode(goalR,OUTPUT);
+pinMode(goalL,OUTPUT);
+pinMode(goalR,OUTPUT);
 
 pinMode(bz,OUTPUT);
 reset();
@@ -108,12 +110,12 @@ updatedisplay();
 
 if (previousgoalL != goalcounterL) {  
   updatedisplay();
-  goalhorn(500,1);
+  goalhorn(200,1);
   previousgoalL=goalcounterL;
 } 
 if (previousgoalR!= goalcounterR) {  
   updatedisplay();
-  goalhorn(500,2);
+  goalhorn(200,2);
   previousgoalR=goalcounterR;
 } 
 
@@ -124,10 +126,10 @@ if (previousgoalR!= goalcounterR) {
 void reset() { // resets all to start mode
 
 //note: on my module, the green and red seem to be reversed
-module.setLED(TM1638_COLOR_GREEN, 0);  // set LED number x to red
-module.setLED(TM1638_COLOR_GREEN, 1); // set LED number x to red
-module.setLED(TM1638_COLOR_RED, 6);  // set LED number x to green
-module.setLED(TM1638_COLOR_RED, 7); // set LED number x to green
+module.setLED(TM1638_COLOR_RED, 0);  // set LED number x to red
+module.setLED(TM1638_COLOR_RED, 1); // set LED number x to red
+module.setLED(TM1638_COLOR_GREEN, 6);  // set LED number x to green
+module.setLED(TM1638_COLOR_GREEN, 7); // set LED number x to green
 module.clearDisplay();
 module.setupDisplay(true,3);
 goalcounterL=0;
@@ -196,20 +198,20 @@ void goalscoredR() {
 void goalhorn(int standard=500,int which=3) {
   switch (which) {
     case (1):
-      digitalWrite(goalL,HIGH);
+      digitalWrite(goalL,LOW);
       break;
     case (2):
-      digitalWrite(goalR,HIGH);
+      digitalWrite(goalR,LOW);
       break;
     default:
-      digitalWrite(goalL,HIGH);
-      digitalWrite(goalR,HIGH);
+      digitalWrite(goalL,LOW);
+      digitalWrite(goalR,LOW);
       break;
   }
   for (int i=0;i<=standard;i++) {
     tone (bz,2000,5);
     delay(10);
   }
-  digitalWrite(goalL,LOW);
-  digitalWrite(goalR,LOW);
+  digitalWrite(goalL,HIGH);
+  digitalWrite(goalR,HIGH);
 }
